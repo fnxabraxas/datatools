@@ -11,16 +11,16 @@ import pandas as pd
 import numpy as np
 # Visualization
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 
 def show_corr(df,th,method='pearson'):
-    "Compute pairwise correlation of columns (excluding NA/null values) of a dataframe (df) using a method, and provide only those that are higher than a threshold (th)"
-    corre=np.triu(df.corr(method=method).values,1) # takes upper triangle of correlation matrix, ignoring the diagonal
-    ixth=np.argwhere(corre>=th)
+    "Compute pairwise correlation (continuos variable) of columns (excluding NA/null values) of a dataframe (df) using a method, and provide only those whose absolute value are higher than a thereshold (th)"
+    cor=df.corr(method=method)
+    corre=np.triu(cor.values,1) # takes upper triangle of correlation matrix, ignoring the diagonal
+    ixth=np.argwhere(np.abs(corre)>=th)  # takes also those that are anti-correlated
     larray=[]
     for i in ixth: 
-        larray.append([df.columns[i[0]],df.columns[i[1]],corre[tuple(i)]])
+        larray.append([cor.columns[i[0]],cor.columns[i[1]],corre[tuple(i)]])
     return larray
 
 def plot_value_counts(df, col):
@@ -39,7 +39,7 @@ def group_categorical_features(df,cols,conorder=True):
 
 def count_categorical(df,cols,colsval=[],prefix_val='value_',prefix_n=False):
     "Create a dataframe with features that count the number of times that categorical values appear in the columns (cols) of a dataframe (df)"
-    "The output dataframe has contain the value of each category if they are introduced in colsval (list qith the same length of cols) "
+    "The output dataframe contains the value of each category if they are introduced in colsval (list qith the same length of cols) "
     "Names of columns contain the categories and optionally a prefix (see prefix_n and prefix_val optional inputs)"
     coladd=pd.concat([df[icol] for icol in cols])
     coladd_dum=pd.get_dummies(coladd)
